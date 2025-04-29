@@ -1,0 +1,20 @@
+# k8s/deploy/base/minio/patch/resource.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  template:
+    spec:
+      containers:
+        - name: minio
+          resources:
+            requests:
+              cpu:  500m
+              memory:  512Mi
+              ephemeral-storage: "1000Mi"
+            limits:
+              cpu:  1000m
+              memory:  1024Mi
+              ephemeral-storage: "5000Mi"

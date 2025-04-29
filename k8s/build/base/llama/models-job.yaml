@@ -1,0 +1,149 @@
+###############################################################################
+# models-job.yaml.j2  –  rendered by Cookiecutter, then applied by kubectl
+###############################################################################
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hf-mirror
+  namespace: llama
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+        - name: work
+          emptyDir: {}
+      containers:
+        - name: mirror
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "1"
+              ephemeral-storage: "30Gi"
+            limits:
+              memory: "8Gi"
+              cpu: "4"
+              ephemeral-storage: "65Gi"
+          volumeMounts:
+            - name: work
+              mountPath: /work
+
+          # 1 — credentials + bucket settings (come from cloud.env → Secret llama‑cm)
+          envFrom:
+            - secretRef:
+                name: llama-cm
+
+          # 2 — model list (rendered from cookiecutter.component.attributes.llama_models)
+          env:
+            - name: MODELS
+              value: |
+                nomic-embed-text
+                llama3:8b
+
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              
+              # Install necessary packages
+              apt-get update && apt-get install -y curl git git-lfs
+              pip install huggingface_hub hf_transfer
+              
+              # Setup HuggingFace credentials
+              mkdir -p /root/.cache/huggingface
+              echo "$HUGGING_TOKEN" > /root/.cache/huggingface/token
+              export HF_HUB_ENABLE_HF_TRANSFER=1
+              
+              # Install Minio client
+              curl -Lo /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+              chmod +x /usr/local/bin/mc
+              
+              # Configure Minio client with improved settings for large files
+              /usr/local/bin/mc alias set minio "$S3_ENDPOINT_URL" \
+                    "$S3_STORAGE_ACCESS_KEY_ID" \
+                    "$S3_STORAGE_SECRET_ACCESS_KEY" --api S3v4
+              
+              # Function to retry uploads with exponential backoff
+              upload_with_retry() {
+                local source=$1
+                local dest=$2
+                local max_attempts=5
+                local attempt=1
+                local wait_time=10
+                
+                while [ $attempt -le $max_attempts ]; do
+                  echo "Upload attempt $attempt of $max_attempts: $source -> $dest"
+                  
+                  set +e
+                  /usr/local/bin/mc cp --recursive "$source" "$dest"
+                  local status=$?
+                  set -e
+                  
+                  if [ $status -eq 0 ]; then
+                    echo "Upload successful!"
+                    return 0
+                  fi
+                  
+                  echo "Upload failed with exit code $status. Waiting ${wait_time}s before retry..."
+                  sleep $wait_time
+                  wait_time=$((wait_time * 2))
+                  attempt=$((attempt + 1))
+                done
+                
+                echo "Failed to upload after $max_attempts attempts"
+                return 1
+              }
+              
+              # Function to map model names to HuggingFace paths
+              get_huggingface_path() {
+                local model_name="$1"
+                
+                case "$model_name" in
+                  "nomic-embed-text")
+                    echo "nomic-ai/nomic-embed-text-v1"
+                    ;;
+                  "llama3")
+                    echo "meta-llama/Meta-Llama-3-8B-Instruct"
+                    ;;
+                  *)
+                    # Return the original name for unknown models
+                    echo "$model_name"
+                    ;;
+                esac
+              }
+              
+              # Process each model
+              IFS=$'\n'
+              for MODEL in $MODELS; do
+                echo "Downloading model: $MODEL"
+                
+                # Get the correct HuggingFace model path
+                ACTUAL_MODEL=$(get_huggingface_path "$MODEL")
+                echo "Using HuggingFace model path: $ACTUAL_MODEL"
+                
+                # Use one-line Python commands to avoid YAML parsing issues
+                MODEL_SAFE=$(echo $MODEL | tr '/' '__')
+                DEST_PATH="/work/${MODEL_SAFE}"
+                
+                # Try to download, but continue even if it fails for one model
+                set +e
+                python -c "from huggingface_hub import snapshot_download; snapshot_download('$ACTUAL_MODEL', local_dir='$DEST_PATH', force_download=False)"
+                DOWNLOAD_STATUS=$?
+                set -e
+                
+                if [ $DOWNLOAD_STATUS -eq 0 ]; then
+                  echo "Successfully downloaded $ACTUAL_MODEL"
+                  echo "Copying $MODEL to S3/MinIO bucket with retries"
+                  
+                  upload_with_retry "$DEST_PATH" "minio/$S3_STORAGE_BUCKET_NAME/$MODEL/"
+                  
+                  rm -rf "$DEST_PATH"
+                  echo "Completed processing $MODEL"
+                else
+                  echo "Failed to download $ACTUAL_MODEL - skipping this model"
+                fi
+              done
+              
+              echo "All models processed successfully"

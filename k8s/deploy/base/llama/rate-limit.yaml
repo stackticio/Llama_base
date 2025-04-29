@@ -1,0 +1,9 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: llama-rate-limit
+  namespace: llama
+plugin: rate-limiting
+config:
+  second: 100
+  policy: local # Use "local" for a single Kong instance, "redis" for distributed rate limiting

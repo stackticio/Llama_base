@@ -1,0 +1,649 @@
+default_context:
+  project_slug: "stacktic"
+  component:
+    group: "stacktic"
+    type: "stacktic"
+    name: "stacktic"
+    attributes:
+      namespace: "stacktic"
+      version: "0.0.1-SNAPSHOT"
+    links_to: {}
+    links_from: {}
+    parent: null
+  links_to: {}
+  links_from: {}
+  sub_components: {}
+  sub_comp_links_to: {}
+  sub_comp_links_from: {}
+  components:
+    llama:
+      group: "ai"
+      type: "llama"
+      name: "llama"
+      attributes:
+        namespace: "llama"
+        port: "11434"
+        rbac: false
+        service_type: "ClusterIP"
+        version: "lamma.v3.1"
+        securityContext: false
+        image_version: "0.3.5"
+        configmap: "TEST=VAR"
+        user_id: "1000"
+        pod_level_security: false
+        pvc: false
+        directory: "/"
+        allow_git: false
+        gpu: false
+        probes: false
+        writable_directory: false
+        hpa: false
+        env: "development"
+        token: "hugging_face_token"
+        cpu_limit: "5000m"
+        cpu_request: "1000m"
+        mem_limit: "8000Mi"
+        mem_request: "2000Mi"
+        llama_models: "nomic-embed-text\r\nllama3:8b"
+        pvc_name: "pvc"
+        huggingface: "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"
+        ephemeral_storage: "20000Mi"
+        mount_path: " /.ollama"
+        files_mount_path: "Default Value"
+        metrics_on: true
+        pvc_size: "60Gi"
+        startup_commands: "echo \"installed\"\r\n"
+      links_to:
+        bucket-llama:
+          group: "ai-storage"
+          type: "llama-bucket"
+          attributes: {}
+          component:
+            group: "storage"
+            type: "bucket"
+            name: "bucket-llama"
+            attributes:
+              access_key: "min8chars1"
+              bucket: "bucketllama"
+              public: true
+              secret_key: "MyStrongPass1!"
+            links_to: {}
+            links_from: {}
+            parent:
+              group: "storage"
+              type: "minio"
+              name: "minio"
+              attributes:
+                access_key: "change_access_key"
+                network_policy: false
+                namespace: "minio"
+                secret_key: "change_secret_key"
+                port: "9000"
+                chart_version_minio: "14.6.0"
+                cpu_limit: "1000m"
+                cpu_request: "500m"
+                mem_limit: "1024Mi"
+                mem_request: "512Mi"
+                ephemeral_storage: "5000Mi"
+                pvc_size: "80Gi"
+              links_to: {}
+              links_from: {}
+              parent: null
+          from_component: null
+      links_from: {}
+      parent: null
+      sub_components: {}
+    qdrant:
+      group: "vectordb"
+      type: "qdrant"
+      name: "qdrant"
+      attributes:
+        namespace: "qdrant"
+      links_to: {}
+      links_from: {}
+      parent: null
+      sub_components: {}
+    flowise:
+      group: "ai"
+      type: "flowise"
+      name: "flowise"
+      attributes:
+        namespace: "flowise"
+        admin_password: "MyStrongPass1!"
+        port: "3000"
+        rbac: false
+        service_type: "ClusterIP"
+        version: "v1.2"
+        securityContext: false
+        image_version: "flowise@2.2.7"
+        configmap: "test=var"
+        user_id: "1000"
+        pod_level_security: false
+        pvc: false
+        directory: "/"
+        probes: false
+        writable_directory: false
+        hpa: false
+      links_to:
+        bucket-flowise:
+          group: "ai-storage"
+          type: "flowise-bucket"
+          attributes: {}
+          component:
+            group: "storage"
+            type: "bucket"
+            name: "bucket-flowise"
+            attributes:
+              access_key: "min8chars1"
+              bucket: "bucketflowise"
+              public: true
+              secret_key: "MyStrongPass1!"
+            links_to: {}
+            links_from: {}
+            parent:
+              group: "storage"
+              type: "minio"
+              name: "minio"
+              attributes:
+                access_key: "change_access_key"
+                network_policy: false
+                namespace: "minio"
+                secret_key: "change_secret_key"
+                port: "9000"
+                chart_version_minio: "14.6.0"
+                cpu_limit: "1000m"
+                cpu_request: "500m"
+                mem_limit: "1024Mi"
+                mem_request: "512Mi"
+                ephemeral_storage: "5000Mi"
+                pvc_size: "80Gi"
+              links_to: {}
+              links_from: {}
+              parent: null
+          from_component: null
+        flowise:
+          group: "ai-psql"
+          type: "flowise-db"
+          attributes: {}
+          component:
+            group: "psql"
+            type: "db"
+            name: "flowise"
+            attributes:
+              database: "flowisedb"
+              password: "pass_default1"
+              username: "user"
+              grant: true
+            links_to: {}
+            links_from: {}
+            parent:
+              group: "psql"
+              type: "cnpg"
+              name: "cnpg"
+              attributes:
+                instance_class: "1"
+                namespace: "cnpg"
+                admin_password: "password_default1"
+                port: "5432"
+                global_version: "0.23.2"
+                psql_version: "ghcr.io/cloudnative-pg/postgresql:15.3"
+                cpu_limit: "2000m"
+                cpu_request: "1000m"
+                mem_limit: "2048Mi"
+                mem_request: "1024Mi"
+              links_to: {}
+              links_from: {}
+              parent: null
+          from_component: null
+        redis:
+          group: "ai-caching"
+          type: "flowise-redis"
+          attributes: {}
+          component:
+            group: "caching"
+            type: "redis"
+            name: "redis"
+            attributes:
+              namespace: "redis"
+              admin_password: "default_password"
+              password: "auth_password"
+            links_to: {}
+            links_from: {}
+            parent: null
+          from_component: null
+      links_from:
+        apisix:
+          group: "gateway-ai"
+          type: "apisix-flowise"
+          attributes:
+            cors: "false"
+            rate_limiting: "false"
+            subdomain: "flowise"
+            whitelist: "fase"
+            proxy_rewrite: "false"
+            headers: "X-Forwarded-Proto: https\r\nX-Forwarded-Port: 443"
+            ip_whitelist: "0.0.0.0/0"
+          component:
+            group: "gateway"
+            type: "apisix"
+            name: "apisix"
+            attributes:
+              namespace: "ingress-apisix"
+              dashboard: true
+              cpu_limit: "500m"
+              cpu_request: "250m"
+              mem_limit: "500Mi"
+              mem_request: "256Mi"
+            links_to: {}
+            links_from: {}
+            parent: null
+          to_component: null
+      parent: null
+      sub_components: {}
+    apisix:
+      group: "gateway"
+      type: "apisix"
+      name: "apisix"
+      attributes:
+        namespace: "ingress-apisix"
+        dashboard: true
+        cpu_limit: "500m"
+        cpu_request: "250m"
+        mem_limit: "500Mi"
+        mem_request: "256Mi"
+      links_to:
+        flowise:
+          group: "gateway-ai"
+          type: "apisix-flowise"
+          attributes:
+            cors: "false"
+            rate_limiting: "false"
+            subdomain: "flowise"
+            whitelist: "fase"
+            proxy_rewrite: "false"
+            headers: "X-Forwarded-Proto: https\r\nX-Forwarded-Port: 443"
+            ip_whitelist: "0.0.0.0/0"
+          component:
+            group: "ai"
+            type: "flowise"
+            name: "flowise"
+            attributes:
+              namespace: "flowise"
+              admin_password: "MyStrongPass1!"
+              port: "3000"
+              rbac: false
+              service_type: "ClusterIP"
+              version: "v1.2"
+              securityContext: false
+              image_version: "flowise@2.2.7"
+              configmap: "test=var"
+              user_id: "1000"
+              pod_level_security: false
+              pvc: false
+              directory: "/"
+              probes: false
+              writable_directory: false
+              hpa: false
+            links_to: {}
+            links_from: {}
+            parent: null
+          from_component: null
+        minio:
+          group: "gateway-storage"
+          type: "apisix-minio"
+          attributes:
+            cors: "Default Value"
+            rate_limiting: "Default Value"
+            subdomain: "Default Value"
+            whitelist: "Default Value"
+            proxy_rewrite: "Default Value"
+            headers: "Default Value"
+            ip_whitelist: "Default Value"
+            cors_headers: "Default Value"
+          component:
+            group: "storage"
+            type: "minio"
+            name: "minio"
+            attributes:
+              access_key: "change_access_key"
+              network_policy: false
+              namespace: "minio"
+              secret_key: "change_secret_key"
+              port: "9000"
+              chart_version_minio: "14.6.0"
+              cpu_limit: "1000m"
+              cpu_request: "500m"
+              mem_limit: "1024Mi"
+              mem_request: "512Mi"
+              ephemeral_storage: "5000Mi"
+              pvc_size: "80Gi"
+            links_to: {}
+            links_from: {}
+            parent: null
+          from_component: null
+      links_from: {}
+      parent: null
+      sub_components: {}
+    minio:
+      group: "storage"
+      type: "minio"
+      name: "minio"
+      attributes:
+        access_key: "change_access_key"
+        network_policy: false
+        namespace: "minio"
+        secret_key: "change_secret_key"
+        port: "9000"
+        chart_version_minio: "14.6.0"
+        cpu_limit: "1000m"
+        cpu_request: "500m"
+        mem_limit: "1024Mi"
+        mem_request: "512Mi"
+        ephemeral_storage: "5000Mi"
+        pvc_size: "80Gi"
+      links_to: {}
+      links_from:
+        apisix:
+          group: "gateway-storage"
+          type: "apisix-minio"
+          attributes:
+            cors: "Default Value"
+            rate_limiting: "Default Value"
+            subdomain: "Default Value"
+            whitelist: "Default Value"
+            proxy_rewrite: "Default Value"
+            headers: "Default Value"
+            ip_whitelist: "Default Value"
+            cors_headers: "Default Value"
+          component:
+            group: "gateway"
+            type: "apisix"
+            name: "apisix"
+            attributes:
+              namespace: "ingress-apisix"
+              dashboard: true
+              cpu_limit: "500m"
+              cpu_request: "250m"
+              mem_limit: "500Mi"
+              mem_request: "256Mi"
+            links_to: {}
+            links_from: {}
+            parent: null
+          to_component: null
+      parent: null
+      sub_components:
+        bucket_flowise:
+          group: "storage"
+          type: "bucket"
+          name: "bucket-flowise"
+          attributes:
+            access_key: "min8chars1"
+            bucket: "bucketflowise"
+            public: true
+            secret_key: "MyStrongPass1!"
+          links_to: {}
+          links_from:
+            flowise:
+              group: "ai-storage"
+              type: "flowise-bucket"
+              attributes: {}
+              component:
+                group: "ai"
+                type: "flowise"
+                name: "flowise"
+                attributes:
+                  namespace: "flowise"
+                  admin_password: "MyStrongPass1!"
+                  port: "3000"
+                  rbac: false
+                  service_type: "ClusterIP"
+                  version: "v1.2"
+                  securityContext: false
+                  image_version: "flowise@2.2.7"
+                  configmap: "test=var"
+                  user_id: "1000"
+                  pod_level_security: false
+                  pvc: false
+                  directory: "/"
+                  probes: false
+                  writable_directory: false
+                  hpa: false
+                links_to: {}
+                links_from: {}
+                parent: null
+              to_component: null
+          parent:
+            group: "storage"
+            type: "minio"
+            name: "minio"
+            attributes:
+              access_key: "change_access_key"
+              network_policy: false
+              namespace: "minio"
+              secret_key: "change_secret_key"
+              port: "9000"
+              chart_version_minio: "14.6.0"
+              cpu_limit: "1000m"
+              cpu_request: "500m"
+              mem_limit: "1024Mi"
+              mem_request: "512Mi"
+              ephemeral_storage: "5000Mi"
+              pvc_size: "80Gi"
+            links_to: {}
+            links_from: {}
+            parent: null
+        bucket_llama:
+          group: "storage"
+          type: "bucket"
+          name: "bucket-llama"
+          attributes:
+            access_key: "min8chars1"
+            bucket: "bucketllama"
+            public: true
+            secret_key: "MyStrongPass1!"
+          links_to: {}
+          links_from:
+            llama:
+              group: "ai-storage"
+              type: "llama-bucket"
+              attributes: {}
+              component:
+                group: "ai"
+                type: "llama"
+                name: "llama"
+                attributes:
+                  namespace: "llama"
+                  port: "11434"
+                  rbac: false
+                  service_type: "ClusterIP"
+                  version: "lamma.v3.1"
+                  securityContext: false
+                  image_version: "0.3.5"
+                  configmap: "TEST=VAR"
+                  user_id: "1000"
+                  pod_level_security: false
+                  pvc: false
+                  directory: "/"
+                  allow_git: false
+                  gpu: false
+                  probes: false
+                  writable_directory: false
+                  hpa: false
+                  env: "development"
+                  token: "hugging_face_token"
+                  cpu_limit: "5000m"
+                  cpu_request: "1000m"
+                  mem_limit: "8000Mi"
+                  mem_request: "2000Mi"
+                  llama_models: "nomic-embed-text\r\nllama3:8b"
+                  pvc_name: "pvc"
+                  huggingface: "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"
+                  ephemeral_storage: "20000Mi"
+                  mount_path: " /.ollama"
+                  files_mount_path: "Default Value"
+                  metrics_on: true
+                  pvc_size: "60Gi"
+                  startup_commands: "echo \"installed\"\r\n"
+                links_to: {}
+                links_from: {}
+                parent: null
+              to_component: null
+          parent:
+            group: "storage"
+            type: "minio"
+            name: "minio"
+            attributes:
+              access_key: "change_access_key"
+              network_policy: false
+              namespace: "minio"
+              secret_key: "change_secret_key"
+              port: "9000"
+              chart_version_minio: "14.6.0"
+              cpu_limit: "1000m"
+              cpu_request: "500m"
+              mem_limit: "1024Mi"
+              mem_request: "512Mi"
+              ephemeral_storage: "5000Mi"
+              pvc_size: "80Gi"
+            links_to: {}
+            links_from: {}
+            parent: null
+    cnpg:
+      group: "psql"
+      type: "cnpg"
+      name: "cnpg"
+      attributes:
+        instance_class: "1"
+        namespace: "cnpg"
+        admin_password: "password_default1"
+        port: "5432"
+        global_version: "0.23.2"
+        psql_version: "ghcr.io/cloudnative-pg/postgresql:15.3"
+        cpu_limit: "2000m"
+        cpu_request: "1000m"
+        mem_limit: "2048Mi"
+        mem_request: "1024Mi"
+      links_to: {}
+      links_from: {}
+      parent: null
+      sub_components:
+        flowise:
+          group: "psql"
+          type: "db"
+          name: "flowise"
+          attributes:
+            database: "flowisedb"
+            password: "pass_default1"
+            username: "user"
+            grant: true
+          links_to: {}
+          links_from:
+            flowise:
+              group: "ai-psql"
+              type: "flowise-db"
+              attributes: {}
+              component:
+                group: "ai"
+                type: "flowise"
+                name: "flowise"
+                attributes:
+                  namespace: "flowise"
+                  admin_password: "MyStrongPass1!"
+                  port: "3000"
+                  rbac: false
+                  service_type: "ClusterIP"
+                  version: "v1.2"
+                  securityContext: false
+                  image_version: "flowise@2.2.7"
+                  configmap: "test=var"
+                  user_id: "1000"
+                  pod_level_security: false
+                  pvc: false
+                  directory: "/"
+                  probes: false
+                  writable_directory: false
+                  hpa: false
+                links_to: {}
+                links_from: {}
+                parent: null
+              to_component: null
+          parent:
+            group: "psql"
+            type: "cnpg"
+            name: "cnpg"
+            attributes:
+              instance_class: "1"
+              namespace: "cnpg"
+              admin_password: "password_default1"
+              port: "5432"
+              global_version: "0.23.2"
+              psql_version: "ghcr.io/cloudnative-pg/postgresql:15.3"
+              cpu_limit: "2000m"
+              cpu_request: "1000m"
+              mem_limit: "2048Mi"
+              mem_request: "1024Mi"
+            links_to: {}
+            links_from: {}
+            parent: null
+    redis:
+      group: "caching"
+      type: "redis"
+      name: "redis"
+      attributes:
+        namespace: "redis"
+        admin_password: "default_password"
+        password: "auth_password"
+      links_to: {}
+      links_from:
+        flowise:
+          group: "ai-caching"
+          type: "flowise-redis"
+          attributes: {}
+          component:
+            group: "ai"
+            type: "flowise"
+            name: "flowise"
+            attributes:
+              namespace: "flowise"
+              admin_password: "MyStrongPass1!"
+              port: "3000"
+              rbac: false
+              service_type: "ClusterIP"
+              version: "v1.2"
+              securityContext: false
+              image_version: "flowise@2.2.7"
+              configmap: "test=var"
+              user_id: "1000"
+              pod_level_security: false
+              pvc: false
+              directory: "/"
+              probes: false
+              writable_directory: false
+              hpa: false
+            links_to: {}
+            links_from: {}
+            parent: null
+          to_component: null
+      parent: null
+      sub_components: {}
+  configuration:
+    system_name: "Llama Sample"
+    build_namespace: "build"
+    build_branch: "main"
+    domain: "my_domain"
+    registry_host: "index.docker.io"
+    registry_auth_uri: "https://index.docker.io/v1/"
+    registry_project: "project"
+    registry_username: "user"
+    registry_password: "XXX"
+    registry_email: "my@email"
+    registry_auth: "XXX"
+    git_host: "github.com"
+    git_project: "Llama_base"
+    git_owner: "stackticio"
+    git_branch: "stacktic"
+    git_username: "stackticio"
+    git_password: "XXX"
+    sops_enabled: false
+    sops_age_recipients: ""
+    sops_age_secret_key: ""

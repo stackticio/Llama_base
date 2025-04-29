@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flowise
+  namespace: flowise
+spec:
+  replicas: 1  # Override replicas at base level
+  template:
+    spec:
+      containers:
+        - name: app
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "256Mi"  # Set request to be <= limit
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"  # Increase limit or match request
+              ephemeral-storage: "500Mi"

@@ -1,0 +1,23 @@
+# Define variables for Kubernetes context and Docker WORKDIR
+k8s_context = 'gke_stacktic-423213_us-west1-c_demo'
+
+# Allow operations in the specified Kubernetes context
+allow_k8s_contexts(k8s_context)
+
+# Use Kustomize to build and apply Kubernetes manifests
+k8s_yaml(kustomize('../../k8s/deploy/base/llama'))
+
+# Define the build for the Ollama container
+docker_build(
+    'index.docker.io/project/llama:lamma.v3.1',
+    context='../../llama',
+    dockerfile='../../llama/Dockerfile'
+    # Note: live_update is less useful here since you're not actively changing code
+)
+
+# Forward the Ollama API port
+k8s_resource(
+    'llama', 
+    port_forwards=11434,  # Ollama's default port
+    labels=['llm', 'inference']
+)

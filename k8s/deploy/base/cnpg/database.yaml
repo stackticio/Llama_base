@@ -1,0 +1,12 @@
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: flowisedb
+  namespace: cnpg
+spec:
+  name: flowisedb
+  owner: user
+  cluster:
+    name: cluster-cnpg

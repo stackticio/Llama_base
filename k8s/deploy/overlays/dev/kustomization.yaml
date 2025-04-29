@@ -1,0 +1,8 @@
+resources:
+  - llama
+  - qdrant
+  - flowise
+  - apisix
+  - minio
+  - cnpg
+  - redis

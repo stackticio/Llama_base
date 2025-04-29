@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flowise
+  namespace: flowise
+  labels:
+    app.kubernetes.io/name: "flowise"
+    app.kubernetes.io/instance: "flowise"
+    app.kubernetes.io/component: "server"
+    app.kubernetes.io/part-of: "llama-sample"
+    app.kubernetes.io/managed-by: "stacktic"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "flowise"
+      app.kubernetes.io/instance: "flowise"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: "flowise"
+        app.kubernetes.io/instance: "flowise"
+        app.kubernetes.io/component: "server"
+        app.kubernetes.io/part-of: "llama-sample"
+        app.kubernetes.io/managed-by: "stacktic"
+    spec:
+      serviceAccountName: flowise
+      containers:
+        - image: index.docker.io/project/flowise:v1.2
+          name: app
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 375m
+              memory: 384Mi
+          ports:
+            - containerPort: 3000
+              name: http
+          #envFrom:
+            #- configMapRef:
+                #name: flowise-config
+          envFrom:
+            - secretRef:
+                name: flowise
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            # Add a writable /tmp directory
+            - mountPath: /tmp
+              name: tmp-volume
+      volumes:
+        # Add a writable tmp volume
+        - name: tmp-volume
+          emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: "flowise"
+                    app.kubernetes.io/instance: "flowise"
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flowise
+  namespace: flowise
+  labels:
+    app.kubernetes.io/name: "flowise"
+    app.kubernetes.io/instance: "flowise"
+    app.kubernetes.io/component: "server"
+    app.kubernetes.io/part-of: "llama-sample"
+    app.kubernetes.io/managed-by: "stacktic"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/name: "flowise"
+

@@ -1,0 +1,4 @@
+resources:
+  - stacktic
+  - llama
+  - flowise

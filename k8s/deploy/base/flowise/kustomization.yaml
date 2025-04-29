@@ -1,0 +1,50 @@
+resources:
+  - namespace.yaml
+  - flowise.yaml
+  - ingress.yaml
+  - rbac.yaml
+  
+#configMapGenerator:
+  #- name: flowise-config
+    #namespace: flowise
+    #envs:
+      #- config/cloud.env
+    #options:
+      #disableNameSuffixHash: true
+      
+secretGenerator:
+  - name: registry-credential
+    namespace: flowise
+    files:
+      - .dockerconfigjson=secret/registry.json
+    type: kubernetes.io/dockerconfigjson
+    options:
+      disableNameSuffixHash: true
+      
+  - name: flowise
+    namespace:  flowise
+    envs:
+      - secret/cloud.env
+    options:
+      disableNameSuffixHash: true
+
+  - name: flowise-cosign-key-secret
+    namespace: flowise
+    files:
+      - secret/cosign/cosign.key
+      - secret/cosign/cosign.pub
+      - secret/cosign/password
+    options:
+      disableNameSuffixHash: true
+    
+      
+labels:
+  - pairs:
+      stacktic.io/app: "flowise"
+      stacktic.io/group: "ai"
+      stacktic.io/namespace: "flowise"
+    includeTemplates: true
+    
+      
+patches:
+  - path: patch/resource-patch.yaml

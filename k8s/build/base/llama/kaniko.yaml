@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: llama-kaniko
+  namespace: build
+spec:
+  template:
+    spec:
+      containers:
+        - name: kaniko
+          image: gcr.io/kaniko-project/executor:v1.21.0
+          args:
+            - "--context=git://github.com/stackticio/Llama_base.git#refs/heads/main"
+            - "--context-sub-path=llama"
+            - "--destination=index.docker.io/project/llama:lamma.v3.1"
+          env:
+            - name: GIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: git-credential
+                  key: password
+            - name: GIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: git-credential
+                  key: username
+          volumeMounts:
+            - name: kaniko-secret
+              mountPath: /kaniko/.docker
+          resources:  
+            requests:
+              memory: "2Gi"
+              cpu: "2000m"
+            limits:
+              memory: "8Gi"
+              cpu: "8000m"
+      restartPolicy: Never
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: registry-credential
+            items:
+              - key: .dockerconfigjson
+                path: config.json

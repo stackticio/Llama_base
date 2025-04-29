@@ -1,0 +1,24 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: cluster-cnpg
+  namespace: cnpg
+spec:
+  # Reference the same cluster name as above
+  cluster:
+    name: cluster-cnpg
+
+  # This ensures volume snapshot backups (not barman backups)
+  method: volumeSnapshot
+
+  # 6-field Cron expression: 0 secs, 0 mins, 0 hrs, every day, month, weekday => midnight
+  schedule: "0 0 0 * * *"
+
+  # Make it a cold snapshot
+  online: false
+
+  # If you want the VolumeSnapshot objects to be deleted when the cluster is removed:
+  backupOwnerReference: cluster
+
+  # If you want a backup **immediately** on creation of this resource in addition to the schedule:
+  # immediate: true
