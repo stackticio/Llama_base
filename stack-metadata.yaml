@@ -103,6 +103,40 @@ default_context:
       links_from: {}
       parent: null
       sub_components: {}
+    cert-manager:
+      group: "platform"
+      type: "cert_manager"
+      name: "cert-manager"
+      attributes:
+        email_contact: "somemail@emil.com"
+        issuer: "selfsigned"
+        acme_url: "https://acme-api/directory"
+        ca_crt: "-----BEGIN CERTIFICATE--"
+        namespace: "cert-manager"
+        rbac: true
+        tls_key: "-----BEGIN CERTIFICATE--"
+        tls_crt: "-----BEGIN CERTIFICATE--"
+        chart_version_certmgr: "1.16.2"
+      links_to: {}
+      links_from: {}
+      parent: null
+      sub_components: {}
+    argo-cd:
+      group: "cicd"
+      type: "argo_cd"
+      name: "argo-cd"
+      attributes:
+        gitops: true
+        namespace: "argocd"
+        admin_password: "default_password"
+        argocd_target_revision: "main"
+        rbac: true
+        argocd_mode: "Manual"
+        image_sync: true
+      links_to: {}
+      links_from: {}
+      parent: null
+      sub_components: {}
     flowise:
       group: "ai"
       type: "flowise"

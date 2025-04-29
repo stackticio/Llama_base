@@ -68,6 +68,8 @@ You can find the documentation for each component here:
 
 - [llama](../llama/README.md)
 - [qdrant](../qdrant/README.md)
+- [cert-manager](../cert-manager/README.md)
+- [argo-cd](../argo-cd/README.md)
 - [flowise](../flowise/README.md)
 - [apisix](../apisix/README.md)
 - [minio](../minio/README.md)

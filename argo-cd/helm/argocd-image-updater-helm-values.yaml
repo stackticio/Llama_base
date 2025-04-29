@@ -1,0 +1,49 @@
+# Chart Info:
+#   chart_name: argocd-image-updater
+#   chart_repo: argo
+#   chart_version: 0.10.1
+#   app_version: v0.13.1
+#   chart_release_date: 16/05/2024
+#   stacktic_update_date: 29/05/2024
+
+
+# Replicas
+replicaCount: 1
+
+# Resources
+resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 375m
+      memory: 384Mi
+
+
+
+# -- The deployment strategy to use to replace existing pods with new ones
+updateStrategy:
+  type: Recreate
+
+# -- ImagePullSecrets for the image updater deployment
+imagePullSecrets: []
+
+# Configuration
+config:
+  argocd:
+    serverAddress: "argo-cd-argocd-server.argocd.svc.cluster.local"
+  # -- Git commits
+  gitCommitMail: argo-cd@argo.com
+  gitCommitUser: beeNotice
+  gitCommitTemplate: "[image-updater] - Update image version"
+  # -- Argo CD Image Updater registries list configuration.  https://argocd-image-updater.readthedocs.io/en/stable/configuration/registries/
+  registries:
+    - name: Registry
+      prefix: docker.io/user
+      api_url: https://registry-1.docker.io
+      credentials: pullsecret:argocd/registry-credential
+      default: true
+
+# RBAC
+rbac:
+  enabled: false

@@ -1,0 +1,42 @@
+
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-addons
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: 'https://github.com/stackticio/Llama_base.git'
+        revision: 'main'
+        directories:
+        
+        - path: 'llama'
+        - path: 'qdrant'
+        - path: 'cert-manager'
+        - path: 'flowise'
+        - path: 'apisix'
+        - path: 'minio'
+        - path: 'cnpg'
+        - path: 'redis'
+        - path: 'networkpolicy'
+        - path: 'stacktic'
+        - path: 'dev_tools'
+        - path: 'scripts'
+          exclude: true
+  template:
+    metadata:
+      # For example, name the Application after the directory
+      # but if everything is excluded, it won't generate anything anyway
+      name: '{{ .path.basename }}'
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/stackticio/Llama_base.git'
+        targetRevision: 'main'
+        path: '{{ .path.path }}'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: 'argocd'

@@ -1,0 +1,361 @@
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: llama
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: llama=index.docker.io/project/llama
+    argocd-image-updater.argoproj.io/llama.update-strategy: "latest"
+    argocd-image-updater.argoproj.io/llama.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-method: "git"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+    argocd-image-updater.argoproj.io/argocd.kustomize.image-name: index.docker.io/project/llama
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/stackticio/Llama_base.git'
+    path: k8s/deploy/overlays/dev/llama
+    targetRevision: main
+    
+    directory:
+      recurse: true
+      exclude: |
+        scripts/*
+        networkpolicy/*
+        doc/*
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /volumeClaimTemplates/0/metadata/creationTimestamp
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qdrant
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: qdrant=index.docker.io/project/qdrant
+    argocd-image-updater.argoproj.io/qdrant.update-strategy: "latest"
+    argocd-image-updater.argoproj.io/qdrant.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-method: "git"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+    argocd-image-updater.argoproj.io/argocd.kustomize.image-name: index.docker.io/project/qdrant
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/stackticio/Llama_base.git'
+    path: k8s/deploy/overlays/dev/qdrant
+    targetRevision: main
+    
+    directory:
+      recurse: true
+      exclude: |
+        scripts/*
+        networkpolicy/*
+        doc/*
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /volumeClaimTemplates/0/metadata/creationTimestamp
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: cert-manager=index.docker.io/project/cert-manager
+    argocd-image-updater.argoproj.io/cert-manager.update-strategy: "latest"
+    argocd-image-updater.argoproj.io/cert-manager.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-method: "git"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+    argocd-image-updater.argoproj.io/argocd.kustomize.image-name: index.docker.io/project/cert-manager
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/stackticio/Llama_base.git'
+    path: k8s/deploy/overlays/dev/cert-manager
+    targetRevision: main
+    
+    directory:
+      recurse: true
+      exclude: |
+        scripts/*
+        networkpolicy/*
+        doc/*
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /volumeClaimTemplates/0/metadata/creationTimestamp
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flowise
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: flowise=index.docker.io/project/flowise
+    argocd-image-updater.argoproj.io/flowise.update-strategy: "latest"
+    argocd-image-updater.argoproj.io/flowise.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-method: "git"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+    argocd-image-updater.argoproj.io/argocd.kustomize.image-name: index.docker.io/project/flowise
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/stackticio/Llama_base.git'
+    path: k8s/deploy/overlays/dev/flowise
+    targetRevision: main
+    
+    directory:
+      recurse: true
+      exclude: |
+        scripts/*
+        networkpolicy/*
+        doc/*
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /volumeClaimTemplates/0/metadata/creationTimestamp
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apisix
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: apisix=index.docker.io/project/apisix
+    argocd-image-updater.argoproj.io/apisix.update-strategy: "latest"
+    argocd-image-updater.argoproj.io/apisix.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-method: "git"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+    argocd-image-updater.argoproj.io/argocd.kustomize.image-name: index.docker.io/project/apisix
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/stackticio/Llama_base.git'
+    path: k8s/deploy/overlays/dev/apisix
+    targetRevision: main
+    
+    directory:
+      recurse: true
+      exclude: |
+        scripts/*
+        networkpolicy/*
+        doc/*
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /volumeClaimTemplates/0/metadata/creationTimestamp
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: minio=index.docker.io/project/minio
+    argocd-image-updater.argoproj.io/minio.update-strategy: "latest"
+    argocd-image-updater.argoproj.io/minio.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-method: "git"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+    argocd-image-updater.argoproj.io/argocd.kustomize.image-name: index.docker.io/project/minio
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/stackticio/Llama_base.git'
+    path: k8s/deploy/overlays/dev/minio
+    targetRevision: main
+    
+    directory:
+      recurse: true
+      exclude: |
+        scripts/*
+        networkpolicy/*
+        doc/*
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /volumeClaimTemplates/0/metadata/creationTimestamp
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cnpg
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: cnpg=index.docker.io/project/cnpg
+    argocd-image-updater.argoproj.io/cnpg.update-strategy: "latest"
+    argocd-image-updater.argoproj.io/cnpg.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-method: "git"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+    argocd-image-updater.argoproj.io/argocd.kustomize.image-name: index.docker.io/project/cnpg
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/stackticio/Llama_base.git'
+    path: k8s/deploy/overlays/dev/cnpg
+    targetRevision: main
+    
+    directory:
+      recurse: true
+      exclude: |
+        scripts/*
+        networkpolicy/*
+        doc/*
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /volumeClaimTemplates/0/metadata/creationTimestamp
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: redis=index.docker.io/project/redis
+    argocd-image-updater.argoproj.io/redis.update-strategy: "latest"
+    argocd-image-updater.argoproj.io/redis.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-method: "git"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+    argocd-image-updater.argoproj.io/argocd.kustomize.image-name: index.docker.io/project/redis
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/stackticio/Llama_base.git'
+    path: k8s/deploy/overlays/dev/redis
+    targetRevision: main
+    
+    directory:
+      recurse: true
+      exclude: |
+        scripts/*
+        networkpolicy/*
+        doc/*
+  destination:
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /volumeClaimTemplates/0/metadata/creationTimestamp
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
+
