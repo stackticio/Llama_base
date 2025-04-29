@@ -1,5 +1,5 @@
 # Define variables for Kubernetes context and Docker WORKDIR
-k8s_context = 'gke_stacktic-423213_us-west1-c_demo'
+k8s_context = 'gke_stacktic-423333_us-west1-cluster-3'
 
 # Allow operations in the specified Kubernetes context
 allow_k8s_contexts(k8s_context)
