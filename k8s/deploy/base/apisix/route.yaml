@@ -6,12 +6,12 @@
 apiVersion: apisix.apache.org/v2
 kind: ApisixUpstream
 metadata:
-  name: Default Value-upstream
+  name: minio-upstream
   namespace: ingress-apisix
   labels:
     app.kubernetes.io/name: "apisix"
     app.kubernetes.io/instance: "apisix"
-    app.kubernetes.io/component: "Default Value"
+    app.kubernetes.io/component: "minio"
     app.kubernetes.io/part-of: "llama-sample"
     app.kubernetes.io/managed-by: "stacktic"
 spec:
@@ -23,22 +23,22 @@ spec:
 apiVersion: apisix.apache.org/v2
 kind: ApisixRoute
 metadata:
-  name: Default Value-route
+  name: minio-route
   namespace: ingress-apisix
   annotations:
     k8s.apisix.apache.org/ingress-class: "apisix"
   labels:
     app.kubernetes.io/name: "apisix"
     app.kubernetes.io/instance: "apisix"
-    app.kubernetes.io/component: "Default Value"
+    app.kubernetes.io/component: "minio"
     app.kubernetes.io/part-of: "llama-sample"
     app.kubernetes.io/managed-by: "stacktic"
 spec:
   http:
-    - name: Default Value
+    - name: minio
       match:
         hosts:
-          - "Default Value.my_domain"
+          - "minio.my_domain"
         paths:
           - "/*"
       websocket: true
@@ -58,36 +58,31 @@ spec:
             allow_methods: "*"
             allow_headers: "*"
             # adjust or add more CORS settings as needed
-        - name: ip-restriction
-          enable: true
-          config:
-            whitelist:
-              - Default
-              - Value
         - name: proxy-rewrite
           enable: true
           config:
             headers:
-              Default Value
+              X-Forwarded-Proto: https
+              X-Forwarded-Port: 443
       upstreams:
-        - name: Default Value-upstream
+        - name: minio-upstream
 ---
 apiVersion: apisix.apache.org/v2
 kind: ApisixTls
 metadata:
-  name: Default Value-tls
+  name: minio-tls
   namespace: ingress-apisix
   annotations:
     k8s.apisix.apache.org/ingress-class: "apisix"
   labels:
     app.kubernetes.io/name: "apisix"
     app.kubernetes.io/instance: "apisix"
-    app.kubernetes.io/component: "Default Value"
+    app.kubernetes.io/component: "minio"
     app.kubernetes.io/part-of: "llama-sample"
     app.kubernetes.io/managed-by: "stacktic"
 spec:
   hosts:
-    - "Default Value.my_domain"
+    - "minio.my_domain"
   secret:
     name: wildcard-tls-secret
     namespace: cert-manager
@@ -98,12 +93,12 @@ spec:
 apiVersion: apisix.apache.org/v2
 kind: ApisixUpstream
 metadata:
-  name: Default Value-api-upstream
+  name: minio-api-upstream
   namespace: ingress-apisix
   labels:
     app.kubernetes.io/name: "apisix"
     app.kubernetes.io/instance: "apisix"
-    app.kubernetes.io/component: "Default Value"
+    app.kubernetes.io/component: "minio"
     app.kubernetes.io/part-of: "llama-sample"
     app.kubernetes.io/managed-by: "stacktic"
 spec:
@@ -115,22 +110,22 @@ spec:
 apiVersion: apisix.apache.org/v2
 kind: ApisixRoute
 metadata:
-  name: Default Value-api-route
+  name: minio-api-route
   namespace: ingress-apisix
   annotations:
     k8s.apisix.apache.org/ingress-class: "apisix"
   labels:
     app.kubernetes.io/name: "apisix"
     app.kubernetes.io/instance: "apisix"
-    app.kubernetes.io/component: "Default Value"
+    app.kubernetes.io/component: "minio"
     app.kubernetes.io/part-of: "llama-sample"
     app.kubernetes.io/managed-by: "stacktic"
 spec:
   http:
-    - name: Default Value-api
+    - name: minio-api
       match:
         hosts:
-          - "api.Default Value.my_domain"
+          - "api.minio.my_domain"
         paths:
           - "/*"
       websocket: true      
@@ -150,36 +145,31 @@ spec:
             allow_methods: "*"
             allow_headers: "*"
             # adjust or add more CORS settings as needed
-        - name: ip-restriction
-          enable: true
-          config:
-            whitelist:
-              - Default
-              - Value
         - name: proxy-rewrite
           enable: true
           config:
             headers:
-              Default Value
+              X-Forwarded-Proto: https
+              X-Forwarded-Port: 443
       upstreams:
-        - name: Default Value-api-upstream
+        - name: minio-api-upstream
 ---
 apiVersion: apisix.apache.org/v2
 kind: ApisixTls
 metadata:
-  name: Default Value-api-tls
+  name: minio-api-tls
   namespace: ingress-apisix
   annotations:
     k8s.apisix.apache.org/ingress-class: "apisix"
   labels:
     app.kubernetes.io/name: "apisix"
     app.kubernetes.io/instance: "apisix"
-    app.kubernetes.io/component: "Default Value"
+    app.kubernetes.io/component: "minio"
     app.kubernetes.io/part-of: "llama-sample"
     app.kubernetes.io/managed-by: "stacktic"
 spec:
   hosts:
-    - "api.Default Value.my_domain"
+    - "api.minio.my_domain"
   secret:
     name: wildcard-tls-secret
     namespace: cert-manager

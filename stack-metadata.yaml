@@ -39,7 +39,7 @@ default_context:
         writable_directory: false
         hpa: false
         env: "development"
-        token: "hugging_face_token"
+        token: "MyStrongToken"
         cpu_limit: "5000m"
         cpu_request: "1000m"
         mem_limit: "8000Mi"
@@ -66,7 +66,7 @@ default_context:
               access_key: "min8chars1"
               bucket: "bucketllama"
               public: true
-              secret_key: "MyStrongPass1!"
+              secret_key: "MyStrongPass123!"
             links_to: {}
             links_from: {}
             parent:
@@ -109,7 +109,7 @@ default_context:
       name: "flowise"
       attributes:
         namespace: "flowise"
-        admin_password: "MyStrongPass1!"
+        admin_password: "MyStrongPass123!"
         port: "3000"
         rbac: false
         service_type: "ClusterIP"
@@ -137,7 +137,7 @@ default_context:
               access_key: "min8chars1"
               bucket: "bucketflowise"
               public: true
-              secret_key: "MyStrongPass1!"
+              secret_key: "MyStrongPass123!"
             links_to: {}
             links_from: {}
             parent:
@@ -171,7 +171,7 @@ default_context:
             name: "flowise"
             attributes:
               database: "flowisedb"
-              password: "pass_default1"
+              password: "MyStrongPass123!"
               username: "user"
               grant: true
             links_to: {}
@@ -269,7 +269,7 @@ default_context:
             name: "flowise"
             attributes:
               namespace: "flowise"
-              admin_password: "MyStrongPass1!"
+              admin_password: "MyStrongPass123!"
               port: "3000"
               rbac: false
               service_type: "ClusterIP"
@@ -294,12 +294,12 @@ default_context:
           attributes:
             cors: "Default Value"
             rate_limiting: "Default Value"
-            subdomain: "Default Value"
-            whitelist: "Default Value"
+            subdomain: "minio"
+            whitelist: false
             proxy_rewrite: "Default Value"
-            headers: "Default Value"
-            ip_whitelist: "Default Value"
-            cors_headers: "Default Value"
+            headers: "X-Forwarded-Proto: https\nX-Forwarded-Port: 443"
+            ip_whitelist: " "
+            cors_headers: " "
           component:
             group: "storage"
             type: "minio"
@@ -349,12 +349,12 @@ default_context:
           attributes:
             cors: "Default Value"
             rate_limiting: "Default Value"
-            subdomain: "Default Value"
-            whitelist: "Default Value"
+            subdomain: "minio"
+            whitelist: false
             proxy_rewrite: "Default Value"
-            headers: "Default Value"
-            ip_whitelist: "Default Value"
-            cors_headers: "Default Value"
+            headers: "X-Forwarded-Proto: https\nX-Forwarded-Port: 443"
+            ip_whitelist: " "
+            cors_headers: " "
           component:
             group: "gateway"
             type: "apisix"
@@ -380,7 +380,7 @@ default_context:
             access_key: "min8chars1"
             bucket: "bucketflowise"
             public: true
-            secret_key: "MyStrongPass1!"
+            secret_key: "MyStrongPass123!"
           links_to: {}
           links_from:
             flowise:
@@ -393,7 +393,7 @@ default_context:
                 name: "flowise"
                 attributes:
                   namespace: "flowise"
-                  admin_password: "MyStrongPass1!"
+                  admin_password: "MyStrongPass123!"
                   port: "3000"
                   rbac: false
                   service_type: "ClusterIP"
@@ -440,7 +440,7 @@ default_context:
             access_key: "min8chars1"
             bucket: "bucketllama"
             public: true
-            secret_key: "MyStrongPass1!"
+            secret_key: "MyStrongPass123!"
           links_to: {}
           links_from:
             llama:
@@ -470,7 +470,7 @@ default_context:
                   writable_directory: false
                   hpa: false
                   env: "development"
-                  token: "hugging_face_token"
+                  token: "MyStrongToken"
                   cpu_limit: "5000m"
                   cpu_request: "1000m"
                   mem_limit: "8000Mi"
@@ -533,7 +533,7 @@ default_context:
           name: "flowise"
           attributes:
             database: "flowisedb"
-            password: "pass_default1"
+            password: "MyStrongPass123!"
             username: "user"
             grant: true
           links_to: {}
@@ -548,7 +548,7 @@ default_context:
                 name: "flowise"
                 attributes:
                   namespace: "flowise"
-                  admin_password: "MyStrongPass1!"
+                  admin_password: "MyStrongPass123!"
                   port: "3000"
                   rbac: false
                   service_type: "ClusterIP"
@@ -605,7 +605,7 @@ default_context:
             name: "flowise"
             attributes:
               namespace: "flowise"
-              admin_password: "MyStrongPass1!"
+              admin_password: "MyStrongPass123!"
               port: "3000"
               rbac: false
               service_type: "ClusterIP"

@@ -25,10 +25,10 @@ spec:
           
               # Check if user exists before adding
               if ! mc admin user info myminio min8chars1 > /dev/null 2>&1; then
-                mc admin user add myminio min8chars1 MyStrongPass1!
+                mc admin user add myminio min8chars1 MyStrongPass123!
               else
                 echo "User min8chars1 already exists. Updating SECRET_KEY"
-                mc admin user add myminio min8chars1 MyStrongPass1!
+                mc admin user add myminio min8chars1 MyStrongPass123!
               fi
               
               sleep 3
@@ -120,10 +120,10 @@ spec:
           
               # Check if user exists before adding
               if ! mc admin user info myminio min8chars1 > /dev/null 2>&1; then
-                mc admin user add myminio min8chars1 MyStrongPass1!
+                mc admin user add myminio min8chars1 MyStrongPass123!
               else
                 echo "User min8chars1 already exists. Updating SECRET_KEY"
-                mc admin user add myminio min8chars1 MyStrongPass1!
+                mc admin user add myminio min8chars1 MyStrongPass123!
               fi
               
               sleep 3

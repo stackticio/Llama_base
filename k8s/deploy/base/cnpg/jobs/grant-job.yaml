@@ -50,7 +50,7 @@ spec:
 
               # 3) Optional verification: connect as the user with its own password
               echo "Verifying password for user 'user'..."
-              PGPASSWORD="pass_default1" \
+              PGPASSWORD="MyStrongPass123!" \
                 psql -h cluster-cnpg-rw.cnpg.svc.cluster.local \
                      -U "user" \
                      -d "flowisedb" \
