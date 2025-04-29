@@ -1,0 +1,32 @@
+resources:
+  - namespace.yaml
+  - argo-cd.yaml
+  - argocd-image-updater.yaml
+  #- network-policy.yaml
+  - updater-rbac.yaml
+  - apps.yaml
+
+secretGenerator:
+  - name: registry-credential
+    namespace: argocd
+    type: kubernetes.io/dockerconfigjson
+    files:
+      - .dockerconfigjson=secret/registry.json
+  - name: git-repository
+    namespace: argocd
+    envs:
+      - secret/git.env
+    options:
+      labels:
+        argocd.argoproj.io/secret-type: repository
+  
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+labels:
+  - pairs:
+      stacktic.io/app: "argo-cd"
+      stacktic.io/group: "cicd"
+      stacktic.io/namespace: "argocd"
+    includeTemplates: true

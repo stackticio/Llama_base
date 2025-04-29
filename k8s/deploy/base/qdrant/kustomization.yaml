@@ -1,0 +1,30 @@
+
+namespace: qdrant
+
+resources:
+  - namespace.yaml
+  - qdrant.yaml
+
+configMapGenerator:
+  - name: qdrant-config
+    namespace: qdrant
+    envs:
+      - config/cloud.env
+
+secretGenerator:
+
+  - name: admin-secret
+    namespace: redis
+    files:
+      - admin-password=secret/admin-password
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+
+labels:
+  - pairs:
+      stacktic.io/app: "qdrant"
+      stacktic.io/group: "vectordb"
+      stacktic.io/namespace: "qdrant"
+    includeTemplates: true

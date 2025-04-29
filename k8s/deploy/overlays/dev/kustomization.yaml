@@ -1,0 +1,10 @@
+resources:
+  - llama
+  - qdrant
+  - cert-manager
+  - argo-cd
+  - flowise
+  - apisix
+  - minio
+  - cnpg
+  - redis

@@ -1,0 +1,69 @@
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-grant-flowise-job
+  namespace: cnpg
+  labels:
+    app.kubernetes.io/name: postgres
+    stacktic.io/app: postgresql
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres
+        job-name: postgres-grant-flowise-job
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: postgres-grant-permissions
+          image:  ghcr.io/cloudnative-pg/postgresql:15.3
+          command: ["/bin/bash","-c"]
+          args:
+            - |
+              set -x
+
+              # 1) Wait for PostgreSQL readiness:
+              RETRIES=8
+              until pg_isready -h  cluster-cnpg-rw.cnpg.svc.cluster.local -U postgres -p 5432 || [ $RETRIES -eq 0 ]; do
+                echo "Waiting for PostgreSQL to be ready (flowise), retries left: $RETRIES"
+                sleep 15
+                RETRIES=$((RETRIES-1))
+              done
+              if [ $RETRIES -eq 0 ]; then
+                echo "PostgreSQL not ready after multiple attempts. Exiting."
+                exit 1
+              fi
+
+              # 2) GRANT statements (run as superuser):
+              echo "Granting privileges for user 'user' on DB 'flowisedb'..."
+              PGPASSWORD="password_default1" \
+                psql -h cluster-cnpg-rw.cnpg.svc.cluster.local \
+                     -U postgres \
+                     -p 5432 \
+                     -c "
+                GRANT ALL PRIVILEGES ON DATABASE \"flowisedb\" TO \"user\";
+                GRANT CREATE, USAGE ON SCHEMA public TO \"user\";
+                ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO \"user\";
+              " flowisedb
+
+              # 3) Optional verification: connect as the user with its own password
+              echo "Verifying password for user 'user'..."
+              PGPASSWORD="MyStrongPass123!" \
+                psql -h cluster-cnpg-rw.cnpg.svc.cluster.local \
+                     -U "user" \
+                     -d "flowisedb" \
+                     -p 5432 \
+                     -c "\q"
+              if [ $? -ne 0 ]; then
+                echo "Password verification failed for user 'user'. Exiting."
+                exit 1
+              fi
+
+              echo "Privileges and password verified successfully for 'user' on 'flowisedb'."
+          env:
+            - name: POSTGRES_PASSWORD
+              value: "password_default1"
+  backoffLimit: 4
+

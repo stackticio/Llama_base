@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama
+  namespace: llama
+spec:
+  replicas: 1  # Override replicas at base level
+  template:
+    spec:
+      containers:
+        - name: app
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "2000Mi" 
+              ephemeral-storage: "5000Mi"
+            limits:
+              cpu: "5000m"
+              memory: "8000Mi"  # Increase limit or match request
+              ephemeral-storage: "20000Mi"

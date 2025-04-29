@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flowise
+   namespace: flowise
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsNonRoot: true  # REQUIRED: Must run as non-root
+        runAsUser: 1000      # REQUIRED: Set a non-root UID
+        runAsGroup: 1000     # REQUIRED: Set a non-root GID
+        seccompProfile:
+          type: RuntimeDefault  # REQUIRED: Must use seccomp
+      hostNetwork: false  # REQUIRED: Must not use host networking
+      hostPID: false      # REQUIRED: Must not share host PID
+      hostIPC: false      # REQUIRED: Must not share host IPC
+      containers:
+        - name: my-app
+          securityContext:
+            allowPrivilegeEscalation: false  # EQUIRED: Must prevent privilege escalation
+            privileged: false  # REQUIRED: Must not be privileged
+            readOnlyRootFilesystem: true  # RECOMMENDED: Should use read-only filesystem
+            capabilities:
+              drop:
+                - ALL  # REQUIRED: Drop all Linux capabilities

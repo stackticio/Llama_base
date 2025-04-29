@@ -1,0 +1,17 @@
+
+apiVersion: postgresql.cnpg.io/v1
+kind: Role
+metadata:
+  name: user-role
+  namespace: cnpg
+spec:
+  name: user
+  cluster:
+    name: cluster-cnpg
+  passwordSecret:
+    name: flowisedb
+    key: password
+  privileges:
+    login: true
+    createdb: true
+---

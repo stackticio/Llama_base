@@ -1,0 +1,122 @@
+# Chart Info:
+#   chart_name: argo-cd
+#   chart_repo: argo
+#   chart_version: 6.11.1
+#   app_version: v2.11.2
+#   chart_release_date: 23/05/2024
+#   stacktic_update_date: 12/06/2024
+
+
+## Custom resource configuration
+crds:
+  install: true
+  keep: true
+
+## Globally shared configuration
+global:
+  networkPolicy:
+    create: false
+  affinity: # Default affinity preset for all components
+    podAntiAffinity: soft
+    nodeAffinity:
+      type: hard
+
+## Argo Configs
+configs:
+  secret:
+    # -- Bcrypt hashed admin password
+    argocdServerAdminPassword: $2b$12$KKLgebZCG1Udf.G2Ise6Au/QwBdvkWLzn9dLKMeWML8S0Pn5ZRGCS
+  rbac:
+    create: true
+    
+## Application controller
+controller:
+  name: application-controller
+  replicas: 1
+  dynamicClusterDistribution: true
+  # Resources
+  resources:
+    requests:
+      cpu: 750m
+      memory: 768Mi
+    limits:
+      cpu: 1
+      memory: 1024Mi
+  
+
+## Dex (External Authentication)
+dex:
+  enabled: false
+  # 
+
+## Redis
+redis:
+  enabled: true
+  name: redis
+  # Resources
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 375m
+      memory: 384Mi
+  
+
+## Redis-HA - Not critical for production
+redis-ha:
+  enabled: false
+
+## Server
+server:
+  name: server
+  replicas: 1
+  # Resources
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  
+
+## Repo Server
+repoServer:
+  name: repo-server
+  replicas: 1
+  # Resources
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  
+  
+
+## ApplicationSet controller
+applicationSet:
+  name: applicationset-controller
+  replicas: 1
+  # Resources
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  
+
+## Notifications controller
+notifications:
+  enabled: false
+  name: notifications-controller
+
+
+
+
+
+

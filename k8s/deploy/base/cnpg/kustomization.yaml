@@ -1,0 +1,31 @@
+resources:
+  - namespace.yaml
+  - cnpg.yaml
+  - cluster.yaml
+  - secret/database-secret.yaml
+  - database.yaml
+
+secretGenerator:
+  - name: cnpg-admin-password
+    namespace: cnpg
+    envs:
+      - secret/cnpg.env
+
+  - name: minio-creds
+    namespace: cnpg
+    envs:
+      - secret/minio.env
+    type: Opaque
+    
+generatorOptions:
+  disableNameSuffixHash: true
+
+labels:
+  - pairs:
+      stacktic.io/app: "cnpg"
+      stacktic.io/group: "psql"
+      stacktic.io/namespace: "cnpg"
+    includeTemplates: true
+
+
+

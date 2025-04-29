@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama
+  namespace: llama
+  labels:
+    app.kubernetes.io/name: "llama"
+    app.kubernetes.io/instance: "llama"
+    app.kubernetes.io/component: "server"
+    app.kubernetes.io/part-of: "llama-sample"
+    app.kubernetes.io/managed-by: "stacktic"
+    env: development
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "llama"
+      app.kubernetes.io/instance: "llama"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: "llama"
+        app.kubernetes.io/instance: "llama"
+        app.kubernetes.io/component: "server"
+        app.kubernetes.io/part-of: "llama-sample"
+        app.kubernetes.io/managed-by: "stacktic"
+        env: development
+    spec:
+      securityContext:
+        fsGroup: 1000
+      serviceAccountName: llama
+      containers:
+        - image: index.docker.io/project/llama:lamma.v3.1
+          name: app
+          imagePullPolicy: Always
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              # Execute installation script
+              /bin/bash /config/install_packages.sh
+               python3 /config/metrics_monitor.py &
+              exec /usr/local/bin/start.sh
+          resources:
+            requests:
+              cpu:  "1000m"
+              memory: "512Mi"
+            limits:
+              cpu:  "2000m"
+              memory: "1024Mi"
+          ports:
+            - containerPort: 11434
+              name: http
+          #envFrom:
+            #- configMapRef:
+                #name: llama-config
+          envFrom:
+            - secretRef:
+                name: llama-cm
+          securityContext:
+            allowPrivilegeEscalation: true
+            privileged: true
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            # writable /tmp
+            - mountPath: /tmp
+              name: tmp-volume
+            - mountPath: /config
+              name: llama-static-files
+              readOnly: true
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
+        - name: llama-static-files
+          configMap:
+            name: llama-static-files
+
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: "llama"
+                    app.kubernetes.io/instance: "llama"
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llama-metrics
+  namespace: llama
+  labels:
+    app.kubernetes.io/name: "llama"
+spec:
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app.kubernetes.io/name: "llama"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llama
+  namespace: llama
+  labels:
+    app.kubernetes.io/name: "llama"
+    app.kubernetes.io/instance: "llama"
+    app.kubernetes.io/component: "server"
+    app.kubernetes.io/part-of: "llama-sample"
+    app.kubernetes.io/managed-by: "stacktic"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 11434
+  selector:
+    app.kubernetes.io/name: "llama"
+

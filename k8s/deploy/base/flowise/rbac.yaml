@@ -1,0 +1,14 @@
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flowise
+  namespace: flowise
+  labels:
+    app.kubernetes.io/name: "flowise"
+    app.kubernetes.io/instance: "flowise"
+    app.kubernetes.io/component: "server"
+    app.kubernetes.io/part-of: "llama-sample"
+    app.kubernetes.io/managed-by: "stacktic"
+imagePullSecrets:
+  - name: registry-credential

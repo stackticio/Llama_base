@@ -1,0 +1,12 @@
+
+resources:
+  - kaniko.yaml
+
+secretGenerator:
+  - name: flowise-cosign-key-secret
+    namespace: build
+    files:
+      - secret/password
+    options:
+      disableNameSuffixHash: true
+

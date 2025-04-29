@@ -1,0 +1,31 @@
+resources:
+  - namespace.yaml
+  - redis.yaml
+
+configMapGenerator:
+  - name: redis-config
+    namespace: redis
+    envs:
+      - config/cloud.env
+
+secretGenerator:
+  - name: redis-secret
+    namespace: redis
+    files:
+      - redis-password=secret/redis-password
+
+  - name: redis-admin-secret
+    namespace: redis
+    files:
+      - admin-password=secret/admin-password
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+
+labels:
+  - pairs:
+      stacktic.io/app: "redis"
+      stacktic.io/group: "caching"
+      stacktic.io/namespace: "redis"
+    includeTemplates: true

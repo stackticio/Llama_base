@@ -1,0 +1,212 @@
+---
+# Source: argocd-image-updater/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argo-cd-argocd-image-updater
+  namespace: "argocd"
+  labels:
+    helm.sh/chart: argocd-image-updater-0.10.1
+    app.kubernetes.io/name: argocd-image-updater
+    app.kubernetes.io/instance: argo-cd
+    app.kubernetes.io/version: "v0.13.1"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: argocd-image-updater/templates/configmap-sshconfig.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    helm.sh/chart: argocd-image-updater-0.10.1
+    app.kubernetes.io/name: argocd-image-updater
+    app.kubernetes.io/instance: argo-cd
+    app.kubernetes.io/version: "v0.13.1"
+    app.kubernetes.io/managed-by: Helm
+  name: argocd-image-updater-ssh-config
+  namespace: "argocd"
+---
+# Source: argocd-image-updater/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    helm.sh/chart: argocd-image-updater-0.10.1
+    app.kubernetes.io/name: argocd-image-updater
+    app.kubernetes.io/instance: argo-cd
+    app.kubernetes.io/version: "v0.13.1"
+    app.kubernetes.io/managed-by: Helm
+  name: argocd-image-updater-config
+  namespace: "argocd"
+data:
+  log.level: "info"
+  git.user: "beeNotice"
+  git.email: "argo-cd@argo.com"
+  git.commit-message-template: |
+    [image-updater] - Update image version
+  kube.events: "false"
+  registries.conf: |
+    registries:
+      - api_url: https://registry-1.docker.io
+        credentials: pullsecret:argocd/registry-credential
+        default: true
+        name: Registry
+        prefix: docker.io/user
+---
+# Source: argocd-image-updater/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-cd-argocd-image-updater
+  namespace: "argocd"
+  labels:
+    helm.sh/chart: argocd-image-updater-0.10.1
+    app.kubernetes.io/name: argocd-image-updater
+    app.kubernetes.io/instance: argo-cd
+    app.kubernetes.io/version: "v0.13.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-image-updater
+      app.kubernetes.io/instance: argo-cd
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/config: 44fe2504e007df9004a5e6c3d7df28340c5781bbec97352fb29404487461f831
+      labels:
+        app.kubernetes.io/name: argocd-image-updater
+        app.kubernetes.io/instance: argo-cd
+    spec:
+      serviceAccountName: argo-cd-argocd-image-updater
+      securityContext:
+        {}
+      containers:
+        - name: argocd-image-updater
+          args:
+            - run
+          env:
+          - name: APPLICATIONS_API
+            valueFrom:
+              configMapKeyRef:
+                key: applications_api
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_GRPC_WEB
+            valueFrom:
+              configMapKeyRef:
+                key: argocd.grpc_web
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: argocd.server_addr
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_INSECURE
+            valueFrom:
+              configMapKeyRef:
+                key: argocd.insecure
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_PLAINTEXT
+            valueFrom:
+              configMapKeyRef:
+                key: argocd.plaintext
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: argocd.token
+                name: argocd-image-updater-secret
+                optional: true
+          - name: IMAGE_UPDATER_LOGLEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: log.level
+                name: argocd-image-updater-config
+                optional: true
+          - name: GIT_COMMIT_USER
+            valueFrom:
+              configMapKeyRef:
+                key: git.user
+                name: argocd-image-updater-config
+                optional: true
+          - name: GIT_COMMIT_EMAIL
+            valueFrom:
+              configMapKeyRef:
+                key: git.email
+                name: argocd-image-updater-config
+                optional: true
+          - name: IMAGE_UPDATER_KUBE_EVENTS
+            valueFrom:
+              configMapKeyRef:
+                key: kube.events
+                name: argocd-image-updater-config
+                optional: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          image: "quay.io/argoprojlabs/argocd-image-updater:v0.13.1"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+            
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 30
+          resources:
+            limits:
+              cpu: 375m
+              memory: 384Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+          - mountPath: /app/config
+            name: image-updater-conf
+          - mountPath: /app/config/ssh
+            name: ssh-known-hosts
+          - mountPath: /app/.ssh
+            name: ssh-config
+          - mountPath: /tmp
+            name: tmp
+      volumes:
+      - configMap:
+          items:
+          - key: registries.conf
+            path: registries.conf
+          - key: git.commit-message-template
+            path: commit.template
+          name: argocd-image-updater-config
+          optional: true
+        name: image-updater-conf
+      - configMap:
+          name: argocd-ssh-known-hosts-cm
+          optional: true
+        name: ssh-known-hosts
+      - configMap:
+          name: argocd-image-updater-ssh-config
+          optional: true
+        name: ssh-config
+      - emptyDir: {}
+        name: tmp

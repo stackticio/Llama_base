@@ -1,0 +1,50 @@
+namespace: llama
+
+resources:
+  - namespace.yaml
+  - llama.yaml
+  - rbac.yaml
+  
+
+secretGenerator:
+  - name: registry-credential
+    namespace: llama
+    files:
+      - .dockerconfigjson=secret/registry.json
+    type: kubernetes.io/dockerconfigjson
+    options:
+      disableNameSuffixHash: true
+
+  - name: llama-cm
+    namespace:  llama
+    envs:
+      - secret/cloud.env
+    options:
+      disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: llama-static-files
+    namespace: llama
+    files:
+      - files/metrics_monitor.py
+      - files/install_packages.sh
+    options:
+      disableNameSuffixHash: true
+
+generatorOptions:
+  disableNameSuffixHash: true
+  
+images:
+  - name: llama
+    newTag: ""  # Placeholder tag
+
+labels:
+  - pairs:
+      stacktic.io/app: "llama"
+      stacktic.io/group: "ai"
+      stacktic.io/namespace: "llama"
+      stacktic.io/version: "lamma.v3.1"
+    includeTemplates: true
+
+patches:
+  - path: patch/resource-patch.yaml

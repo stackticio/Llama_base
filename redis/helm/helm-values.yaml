@@ -1,0 +1,78 @@
+# Chart Info:
+#   chart_name: redis
+#   chart_repo: bitnami
+#   chart_version: 19.5.5
+#   app_version: 7.2.5
+#   chart_release_date: 18/06/2024
+#   stacktic_update_date: 29/05/2024
+
+
+global:
+  redis:
+    password: ""
+
+auth:
+  enabled: true
+  existingSecret: redis-secret
+  existingSecretPasswordKey: redis-password
+  usePasswordFiles: true
+
+master:
+  extraEnvVarsSecret: redis-admin-secret
+  extraEnvVars:
+    - name: REDIS_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis-admin-secret
+          key: admin-password
+
+# Architecture
+architecture: standalone
+
+# Network Policy
+networkPolicy:
+  enabled: false
+
+## Master
+master:
+  # Resources
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 375m
+      memory: 384Mi
+  # Storage
+  persistence:
+    enabled: true
+    size: 8Gi
+  # Service
+  service:
+    ports:
+      redis: 6379
+
+## Replica
+replica:
+  # Replicas
+  replicaCount: 3
+  # Resources
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 375m
+      memory: 384Mi
+  # Storage
+  persistence:
+    enabled: true
+    size: 8Gi
+  # Service
+  service:
+    type: ClusterIP
+    ports:
+      redis: 6379
+
+# Metrics
+
